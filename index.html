@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Video Study</title>
+
+<style>
+body {
+  font-family: Arial;
+  text-align: center;
+}
+
+#container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+video {
+  width: 300px;
+}
+
+#playBtn {
+  padding: 10px 20px;
+  font-size: 16px;
+  margin: 20px;
+}
+
+#status {
+  color: red;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Video Evaluation</h2>
+
+<p id="status">Loading videos...</p>
+
+<button id="playBtn" disabled onclick="playAll()">Play All</button>
+
+<div id="container">
+  <video preload="auto"><source src="video1.mp4"></video>
+  <video preload="auto"><source src="video2.mp4"></video>
+  <video preload="auto"><source src="video3.mp4"></video>
+  <video preload="auto"><source src="video4.mp4"></video>
+  <video preload="auto"><source src="video5.mp4"></video>
+  <video preload="auto"><source src="video6.mp4"></video>
+  <video preload="auto"><source src="video7.mp4"></video>
+</div>
+
+<script>
+const videos = document.querySelectorAll("video");
+const statusText = document.getElementById("status");
+const playBtn = document.getElementById("playBtn");
+
+let loadedCount = 0;
+
+videos.forEach(v => {
+  v.addEventListener("canplaythrough", () => {
+    loadedCount++;
+    if (loadedCount === videos.length) {
+      statusText.innerText = "All videos loaded. Ready to play.";
+      playBtn.disabled = false;
+    }
+  });
+});
+
+function playAll(){
+  videos.forEach(v=>{
+    v.currentTime = 0;
+    v.muted = true;
+  });
+
+  Promise.all([...videos].map(v=>v.play()))
+    .then(()=>{
+      videos[0].muted = false;
+    })
+    .catch(()=>{
+      alert("Click again to start playback");
+    });
+}
+</script>
+
+</body>
+</html>
