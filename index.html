@@ -238,6 +238,7 @@ const ratingInputs = document.querySelectorAll(".rating input");
 
 let loaded = new Set();
 let ended = new Set();
+let hasPlayedOnce = false;
 
 ratingInputs.forEach(input => {
   input.disabled = true;
@@ -260,12 +261,15 @@ videos.forEach((v, idx) => {
     ended.add(idx);
 
     if (ended.size === videos.length) {
-      statusText.innerText = "Playback finished. Please rate all videos.";
+      statusText.innerText = "Playback finished. Please rate all videos. You may replay if needed.";
       statusText.style.color = "#5affdc";
 
       ratingInputs.forEach(input => {
         input.disabled = false;
       });
+
+      playBtn.disabled = false;
+      playBtn.innerText = "Replay All";
 
       checkSubmitReady();
     }
@@ -281,19 +285,26 @@ videos.forEach((v, idx) => {
 });
 
 async function playAll(){
-  ended.clear();
 
-  submitBtn.disabled = true;
+  if (!hasPlayedOnce) {
+    ended.clear();
 
-  ratingInputs.forEach(input => {
-    input.checked = false;
-    input.disabled = true;
-  });
+    submitBtn.disabled = true;
 
-  playBtn.disabled = true;
-  playBtn.innerText = "Playing...";
-  statusText.innerText = "Playing videos. Please watch until the end.";
-  statusText.style.color = "#ffd166";
+    ratingInputs.forEach(input => {
+      input.disabled = true;
+    });
+
+    playBtn.disabled = true;
+    playBtn.innerText = "Playing...";
+    statusText.innerText = "Playing videos. Please watch until the end.";
+    statusText.style.color = "#ffd166";
+  } else {
+    playBtn.disabled = true;
+    playBtn.innerText = "Replaying...";
+    statusText.innerText = "Replaying videos. You may revise your ratings if needed.";
+    statusText.style.color = "#ffd166";
+  }
 
   videos.forEach(v => {
     try {
@@ -311,14 +322,14 @@ async function playAll(){
   if (ok === 0) {
     alert("Playback failed. Please click Play All again.");
     playBtn.disabled = false;
-    playBtn.innerText = "Play All";
+    playBtn.innerText = hasPlayedOnce ? "Replay All" : "Play All";
     statusText.innerText = "Playback failed. Please try again.";
     statusText.style.color = "#ff5555";
     return;
   }
 
   videos[0].muted = false;
-  playBtn.innerText = "Replay All";
+  hasPlayedOnce = true;
 }
 
 function getScore(i){
